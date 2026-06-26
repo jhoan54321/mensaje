@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+
+  api:
+    build: .
+    container_name: api_mensajeria
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - redis
+      - rabbitmq
+
+    environment:
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+
+  worker:
+    build: .
+    container_name: worker_mensajeria
+
+    command: python worker.py
+
+    depends_on:
+      - redis
+      - rabbitmq
+
+    environment:
+      REDIS_HOST: redis
+      RABBITMQ_HOST: rabbitmq
+
+  redis:
+    image: redis:7-alpine
+
+    container_name: redis
+
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+
+    container_name: rabbitmq
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
